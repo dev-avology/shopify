@@ -1,0 +1,19 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "0ea8014173ff4c08a31facfc2bbe5fe5"
+name = "Product Options (FashionKilt)"
+handle = "product-options-31"
+application_url = "https://options.fashionkilt.com/"
+embedded = true
+
+[build]
+include_config_on_deploy = false
+
+[auth]
+redirect_urls = [ "https://options.fashionkilt.com/authenticate" ]
+
+[webhooks]
+api_version = "2023-04"
+
+[pos]
+embedded = false

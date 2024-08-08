@@ -1,0 +1,171 @@
+<script>
+
+
+
+
+    (function(YGPRODUCTOPTIONS){
+
+        Element.prototype.trigger=function(type){
+            var elem = this;
+            var event = document.createEvent("MouseEvents");
+            event.initMouseEvent(type, true, true, elem.ownerDocument.defaultView, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            elem.dispatchEvent( event );
+        }
+
+        YGPRODUCTOPTIONS.App = YGPRODUCTOPTIONS.App || {};
+        YGPRODUCTOPTIONS.App.url = "https://boilerplate.algomative.com/api";
+
+
+        YGPRODUCTOPTIONS.config = YGPRODUCTOPTIONS.config || {};
+
+        YGPRODUCTOPTIONS.config.default_money_format = "{{ shop.money_format }}".replace(/<\/?span[^>]*>/g,"");
+        YGPRODUCTOPTIONS.config.default_money_with_currency_format = "{{ shop.money_with_currency_format }}".replace(/<\/?span[^>]*>/g,"");
+
+        YGPRODUCTOPTIONS.config.page = "{{ request.page_type }}";
+
+
+        // Common Functions
+        YGPRODUCTOPTIONS.utils = {
+
+            // ---------------------------------------------------------------------------------------
+            // Money format handler - Will parse the amount into store currency and return an object:
+            //      {
+            //          symbol: currency_symbol (string) =>              "$",       "¥",       "£"
+            //          amount_with_symbol: formatted_money (string) =>  "$50.35"   "¥50.00"   "£0.00"
+            //          amount: parsed_amount (string) =>                 "50.35"    "50.00"    "0.00"
+            //      }
+            // ---------------------------------------------------------------------------------------
+            formatMoney(cents, format) {
+                if (typeof cents !== 'number') { cents = Number( cents ); }
+                var value = '';
+                var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+                var formatString = (format || YGPRODUCTOPTIONS.config.default_money_format || "{% raw %}${{amount}}{% endraw %}");
+
+                function defaultOption(opt, def) {
+                    return (typeof opt == 'undefined' ? def : opt);
+                }
+
+                function formatWithDelimiters(number, precision, thousands, decimal) {
+                    precision = defaultOption(precision, 2);
+                    thousands = defaultOption(thousands, '');
+                    decimal   = defaultOption(decimal, '.');
+
+                    if (isNaN(number) || number === null) { return "0.00"; }
+
+                    number = (number).toFixed(precision);
+
+                    var parts   = number.split('.'),
+                        dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands),
+                        cents   = parts[1] ? (decimal + parts[1]) : '';
+
+                    return dollars + cents;
+                }
+
+                switch(formatString.match(placeholderRegex)[1]) {
+                    case 'amount':
+                        value = formatWithDelimiters(cents, 2);
+                        break;
+                    case 'amount_no_decimals':
+                        value = formatWithDelimiters(cents, 0);
+                        break;
+                    case 'amount_with_comma_separator':
+                        value = formatWithDelimiters(cents, 2, '.', ',');
+                        break;
+                    case 'amount_no_decimals_with_comma_separator':
+                        value = formatWithDelimiters(cents, 0, '.', ',');
+                        break;
+                }
+
+                return {
+                    symbol: formatString.replace(placeholderRegex, ''),
+                    amount_with_symbol: formatString.replace(placeholderRegex, value),
+                    amount: value
+                };
+            },
+
+            // AJAX `fetch` global config
+            fetchConfig(type = 'json') {
+                return {
+                headers: { 'Content-Type': 'application/json', 'Accept': `application/${type}` }
+                };
+            },
+
+            sendRequest: function(url, method, payload = null){
+
+                var config = this.fetchConfig('javascript');
+                config.headers['X-Requested-With'] = 'XMLHttpRequest';
+                config.method = method;
+                if(payload){
+                  config.body = JSON.stringify(payload);
+                }
+
+                var baseUrl = YGPRODUCTOPTIONS.App.url;
+                if(url.indexOf('http') > -1)baseUrl = '';
+
+                return fetch(`${baseUrl}${url}`, config);
+            }
+        }
+
+
+        // Generate cart items
+        var cart = {{ cart | json }};
+        var cart_items = cart.items.map(function(item){
+            var options = [];
+            var props = item.properties;
+            if(!!props){
+                Object.keys(props).forEach(function(key){
+
+                    if(key.indexOf('_ygpooption')>-1){
+                        var o = {};
+                        var value = props[key];
+                        var newKey = key.split('|');
+
+                        value = value.split('|');
+                        o.id = newKey[1];
+                        o.charge = !!value[1] ? parseFloat(value[1]) : 0;
+                        o.value_id = value[0];
+
+                        options.push(o);
+                    }
+                })
+            }
+
+            return {
+                id: item.id,
+                key: item.key,
+                quantity: item.quantity,
+                price: item.price,
+                product_title: item.product_title,
+                product_id: item.product_id,
+                options: options
+            }
+        })
+        YGPRODUCTOPTIONS.cart_items = cart_items;
+
+        YGPRODUCTOPTIONS.productWithCollections = [];
+
+        {% if request.page_type == 'product' %}
+            {% for collection in product.collections %}
+                YGPRODUCTOPTIONS.productWithCollections.push({product_id: {{ product.id }}, collection_id: {{ collection.id }}})
+            {% endfor %}
+
+        {% else %}
+
+            YGPRODUCTOPTIONS.cartData = cart;
+
+            {% for item in cart.items %}
+                {% for collection in item.product.collections %}
+                    YGPRODUCTOPTIONS.productWithCollections.push({product_id: {{ item.product_id }}, collection_id: {{ collection.id }}})
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+
+
+
+        {% if customer %}
+            YGPRODUCTOPTIONS.customer_id = {{ customer.id }};
+        {% endif %}
+    })(window.YGPRODUCTOPTIONS = window.YGPRODUCTOPTIONS || {})
+
+
+</script>

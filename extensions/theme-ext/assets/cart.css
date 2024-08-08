@@ -1,0 +1,146 @@
+.ygpo-discount-box {
+    display: flex;
+    align-items: center;
+    margin-bottom:.4rem;
+    flex-flow:wrap;
+  }
+
+
+  .ygpo-discount-box input[type="text"]{
+      margin:0;
+    flex: 1;
+  }
+  .ygpo-discount-box button {
+    margin-left:.3rem;
+    background-color: transparent;
+    height:100%;
+    padding: .4rem .7rem;
+    cursor: pointer;
+    border: 2px solid #141414;
+    flex: 0.1;
+  }
+  .ygpo-discount-box button:hover{
+    background-color: #141414;
+    color:#fff;
+  }
+
+  .ygpo-discount-box .ygpo-discount-error {
+      width:100%;
+      color: rgba(227,44,43,1);
+      margin: 0;
+      font-size: .9rem;
+      padding: 0.3rem 0;
+      font-weight: 600;
+      text-align: center;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg {
+      width:100%;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount--tag {
+      position: relative;
+      margin: 11px 6px 15px 0;
+      padding: 1px 20px 1px 8px;
+      font-size: inherit;
+      font-weight: 400;
+      text-align: center;
+      color: #fff;
+      background-color: #4a9bd5;
+      border-radius: 3px;
+      transition: background-color 0.3s ease;
+      cursor: default;
+  }
+
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount--tag__name {
+      margin-right: 3px;
+      font-size: 0.5rem;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount---tag__remove {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      height: 100%;
+      padding: 0 5px;
+      font-size: 16px;
+      font-weight: 400;
+      transition: opacity 0.3s ease;
+      opacity: 0.5;
+      cursor: pointer;
+      border: 0;
+      background-color: transparent;
+      color: #fff !important;
+      line-height: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount-item {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount-item .ygpo-discount-amount{
+      margin-left: 1rem;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount-item .ygpo-discount-amount.ygpo-discount-amount--discounted{
+      color: red !important;
+  }
+
+  .ygpo-discount-box .ygpo-discount-msg .ygpo-discount-item .ygpo-discount-label{
+      font-weight: bold;
+  }
+
+
+  .ygpo--loading{
+    position:relative;
+    color: transparent !important;
+    pointer-events:none;
+
+  }
+  .ygpo--loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 1;
+    transition: opacity .5s;
+  }
+
+
+  .ygpo--loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -7px 0 0 -7px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border-left: 2px solid transparent;
+    border-top: 2px solid #ffffff;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    animation: ygpo-rotate .6s linear infinite;
+    opacity: 1;
+    mix-blend-mode: difference;
+  }
+
+
+  @keyframes ygpo-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

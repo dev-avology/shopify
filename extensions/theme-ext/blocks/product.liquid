@@ -1,0 +1,86 @@
+
+
+
+<script>
+
+    (function(YGPRODUCTOPTIONS){
+
+
+        // Fetch options from metafields
+        var options = {{ product.metafields.ygpo_options | json }};
+        var optionset = null;
+        {% if product.metafields.ygproductoptions.optionset %}
+            optionset = {{ product.metafields.ygproductoptions.optionset }};
+        {% endif %}
+        var channel = "{{ product.metafields.ygproductoptions.channel }}";
+        var conditions = null;
+        {% if product.metafields.ygpo_conditions %}
+            conditions = {{ product.metafields.ygpo_conditions | json }};
+            
+            // Since consitions are in key-pair value format, we need to convert it to array
+            conditions = Object.keys(conditions)
+            .map(function(x){return conditions[x]});
+            
+        {% endif %}
+
+        // Since options are in key-pair value format, we need to convert it to array
+        options = Object.keys(options)
+        .map(function(x){return options[x]})
+        .filter(function(op){return typeof op.enabled === "undefined" || op.enabled === true || op.enabled === 1})
+        .sort(function(a, b){
+            return a.position - b.position;
+        });
+
+
+        YGPRODUCTOPTIONS.product = {
+            selectors: {
+                option: "{{ block.settings.selectors_options }}",
+                add_to_cart: "{{ block.settings.selectors_atc }}",
+                price: "{{ block.settings.selectors_price }}"
+            },
+            optionset: optionset,
+            channel: channel,
+            conditions: conditions,
+            options: options
+        }
+
+    })(window.YGPRODUCTOPTIONS = window.YGPRODUCTOPTIONS || {})
+
+
+</script>
+
+
+{% schema %}
+{
+    "name": "Product Page",
+    "target": "head",
+    "enabled_on": {
+        "templates": ["product"]
+    },
+    "stylesheet": "product.css",
+    "javascript": "product.js",
+    "settings": [
+
+        {
+            "type": "text",
+            "id": "selectors_options",
+            "label": "Selectors - Options",
+            "info": "i.e. '#add-to-cart-form@afterbegin'. You can use afterbegin, beforeend, beforebegin, afterend"
+        },
+        {
+            "type": "text",
+            "id": "selectors_atc",
+            "label": "Selectors - Add to Card",
+            "info": "i.e. '#add-to-cart-button'"
+        },
+        {
+            "type": "text",
+            "id": "selectors_price",
+            "label": "Selectors - Price",
+            "info": "i.e. '.prices .price span'"
+        }
+
+
+    ]
+}
+{% endschema %}
